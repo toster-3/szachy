@@ -2,5 +2,5 @@
 
 ```sh
 make
-./build/wyscigi_fizyka
+./build/szachy
 ```
