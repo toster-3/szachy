@@ -1,8 +1,5 @@
-# Fizyka costam
+# szachy
 
-maly test fizyki na projekt
-
-zeby sprobowac:
 ```sh
 make
 ./build/wyscigi_fizyka
