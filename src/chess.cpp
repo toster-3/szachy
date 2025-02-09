@@ -30,6 +30,7 @@ Board Chess::getBoard()
 	return this->board;
 }
 
+// todo: transition to bitboards at some point
 Chess::Chess(std::string s)
 {
 	int idx = 0;

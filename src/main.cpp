@@ -82,6 +82,31 @@ void ungetPieceTextures(std::array<Texture, 12> textures)
 	}
 }
 
+int whereInBoardIsPos(Vector2 pos, Rectangle boardRec, float cellSize)
+{
+	if (!CheckCollisionPointRec(pos, boardRec)) {
+		return -1;
+	}
+
+	Rectangle rec = boardRec;
+	rec.height = cellSize;
+	rec.width = cellSize;
+
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (CheckCollisionPointRec(pos, rec)) {
+				return i * 8 + j;
+			}
+			rec.x += cellSize;
+		}
+		rec.x = boardRec.x;
+		rec.y += cellSize;
+	}
+
+	// this shouldnt happen :)
+	return -1;
+}
+
 int main(void)
 {
 	Chess chess("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -109,9 +134,14 @@ int main(void)
 	};
 	float boardSize = 0.75f * scrHeightFloat;
 	float cellSize = boardSize / 8;
+	Rectangle boardRec = Rectangle{orig.x, orig.y, boardSize, boardSize};
 	std::array<Texture, 12> pieceTextures = getPieceTextures(cellSize);
 
 	while (!WindowShouldClose()) {
+
+		Vector2 mousePos = GetMousePosition();
+
+		int mouseCell = whereInBoardIsPos(mousePos, boardRec, cellSize);
 
 		BeginDrawing();
 		ClearBackground(BG_COLOR);
@@ -124,6 +154,10 @@ int main(void)
 
 				if (i % 2 != j % 2) {
 					DrawRectangle(i * cellSize + orig.x, j * cellSize + orig.y, cellSize, cellSize, DARK_SQUARE_COLOR);
+				}
+
+				if (mouseCell == currentSquare) {
+					DrawRectangle(i * cellSize + orig.x, j * cellSize + orig.y, cellSize, cellSize, LIME);
 				}
 
 				try {
