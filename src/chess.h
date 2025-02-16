@@ -4,6 +4,7 @@
 #include <string>
 
 enum PieceTag {
+	PIECE_NONE,
 	WPAWN = 'P',
 	WKNIGHT = 'N',
 	WBISHOP = 'B',
@@ -20,14 +21,16 @@ enum PieceTag {
 
 struct Piece {
 	PieceTag tag;
+
+	Piece();
+	Piece(PieceTag);
 };
 
 typedef std::array<Piece, 64> Board;
 
-class Chess {
+struct Chess {
 	std::array<Piece, 64> board;
 
-public:
 	Chess(std::string);
-	Board getBoard();
+	Piece drop(int);
 };

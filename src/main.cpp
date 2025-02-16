@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 
@@ -110,7 +111,7 @@ int whereInBoardIsPos(Vector2 pos, Rectangle boardRec, float cellSize)
 int main(void)
 {
 	Chess chess("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	for (auto i : chess.getBoard()) {
+	for (auto i : chess.board) {
 		std::cout.put(i.tag);
 		std::cout << " ";
 	}
@@ -136,6 +137,9 @@ int main(void)
 	float cellSize = boardSize / 8;
 	Rectangle boardRec = Rectangle{orig.x, orig.y, boardSize, boardSize};
 	std::array<Texture, 12> pieceTextures = getPieceTextures(cellSize);
+	Piece heldPiece(PIECE_NONE);
+	bool holding = false;
+	int origCell = 0;
 
 	while (!WindowShouldClose()) {
 
@@ -143,8 +147,23 @@ int main(void)
 
 		int mouseCell = whereInBoardIsPos(mousePos, boardRec, cellSize);
 
+		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && mouseCell > -1) {
+			if (holding == false && chess.board[mouseCell].tag != PIECE_NONE) {
+				holding = true;
+				origCell = mouseCell;
+				heldPiece = chess.drop(mouseCell);
+			}
+		} else if (!IsMouseButtonDown(MOUSE_LEFT_BUTTON) && holding) {
+			holding = false;
+			int cell = (mouseCell > -1) ? mouseCell : origCell;
+			chess.board[cell] = heldPiece;
+			heldPiece.tag = PIECE_NONE;
+		}
+
 		BeginDrawing();
 		ClearBackground(BG_COLOR);
+
+		DrawText(TextFormat("held: %x\nholding: %d", &heldPiece, holding), 0, 0, 20, GRAY);
 
 		DrawRectangle(orig.x, orig.y, boardSize, boardSize, LIGHT_SQUARE_COLOR);
 
@@ -161,12 +180,17 @@ int main(void)
 				}
 
 				try {
-					DrawTexture(pieceTexture(chess.getBoard().at(currentSquare), pieceTextures), i * cellSize + orig.x,
+					DrawTexture(pieceTexture(chess.board.at(currentSquare), pieceTextures), i * cellSize + orig.x,
 					            j * cellSize + orig.y, WHITE);
 				} catch (std::invalid_argument &e) {
 					// dont draw
 				}
 			}
+		}
+
+		try {
+			DrawTexture(pieceTexture(heldPiece, pieceTextures), mousePos.x, mousePos.y, WHITE);
+		} catch (std::invalid_argument &e) {
 		}
 
 		EndDrawing();

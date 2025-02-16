@@ -25,10 +25,8 @@ bool isPiece(unsigned char c)
 	}
 }
 
-Board Chess::getBoard()
-{
-	return this->board;
-}
+Piece::Piece() : tag(PIECE_NONE) {}
+Piece::Piece(PieceTag t) : tag(t) {}
 
 // todo: transition to bitboards at some point
 Chess::Chess(std::string s)
@@ -49,4 +47,11 @@ Chess::Chess(std::string s)
 			idx += (c - '0');
 		}
 	}
+}
+
+Piece Chess::drop(int idx)
+{
+	Piece ret = board[idx];
+	board[idx] = PIECE_NONE;
+	return ret;
 }
